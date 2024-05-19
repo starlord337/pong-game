@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body {
+        background: black;
+        margin: 0;
+    }
+</style>
+
+<body>
+    <canvas id="canvas">
+
+    </canvas>
+</body>
+<script>
+    const canvas = document.querySelector('canvas')
+    const c = canvas.getContext('2d')
+
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+    console.log('canvas size', canvas.width, canvas.height)
+
+    class Paddle {
+        constructor({ position }) {
+            this.position = position
+            this.velocity = {
+                x: 0,
+                y: 0
+            }
+            this.width = 10
+            this.height = 150
+        }
+
+
+        draw() {
+            c.fillStyle = 'white'
+            c.fillRect(this.position.x, this.position.y, this.width, this.height)
+        }
+
+        update() {
+            this.draw()
+            if (this.position.y + this.velocity.y > 0 && this.position.y + this.height + this.velocity.y < canvas.height) {
+                this.position.y += this.velocity.y
+            }
+        }
+    }
+
+    const ballSpeed = 3
+
+    class Ball {
+        constructor({ position }) {
+            this.position = position
+            const direction = {
+                x: Math.random() - 0.5 >= 0 ? ballSpeed : -ballSpeed,
+                y: Math.random() - 0.5 >= 0 ? ballSpeed : -ballSpeed
+            }
+            this.velocity = {
+                x: direction.x,
+                y: direction.y
+            }
+            this.radius = 10
+            this.height = 10
+            this.width = 10
+        }
+
+
+        draw() {
+            c.fillStyle = 'white'
+            c.fillRect(this.position.x, this.position.y, this.width, this.height)
+        }
+
+        update() {
+            this.draw()
+
+            const rightSide = this.position.x + this.width + this.velocity.x
+            const leftSide = this.position.x + this.velocity.x
+            const bottomSide = this.position.y + this.height
+            const topSide = this.position.y
+
+            if (rightSide >= paddle2.position.x &&
+                bottomSide >= paddle2.position.y &&
+                topSide <= paddle2.position.y + paddle2.height) {
+                this.velocity.x = -this.velocity.x
+            }
+
+            if (leftSide <= paddle1.position.x + paddle1.width &&
+                bottomSide >= paddle1.position.y &&
+                topSide <= paddle1.position.y + paddle1.height) {
+                this.velocity.x = -this.velocity.x
+            }
+
+            if (bottomSide >= canvas.height || topSide <= 0) {
+                this.velocity.y = -this.velocity.y
+            }
+
+            this.position.x += this.velocity.x
+            this.position.y += this.velocity.y
+        }
+
+    }
+
+    // c.fillRect(0,0, 100, 100)
+
+    const paddle1 = new Paddle({
+        position: {
+            x: 10,
+            y: 100
+        }
+    })
+    const paddle2 = new Paddle({
+        position: {
+            x: canvas.width - 10 * 2,
+            y: 100
+        }
+    })
+
+    const ball = new Ball({
+        position: {
+            x: canvas.width / 2,
+            y: canvas.height / 2
+        }
+    })
+
+    function animate() {
+        requestAnimationFrame(animate)
+        c.fillStyle = 'black'
+        c.fillRect(0, 0, canvas.width, canvas.height)
+        paddle2.update()
+        paddle1.update()
+        ball.update()
+    }
+    animate()
+
+    const speed = 5
+
+    addEventListener('keydown', (event) => {
+        switch (event.key) {
+            case 's':
+                paddle1.velocity.y = speed
+                console.log('up');
+                //go down
+                break;
+            case 'w':
+                paddle1.velocity.y = -speed
+                console.log('down');
+                //go up
+                break;
+
+            case 'ArrowDown':
+                paddle2.velocity.y = speed
+                //go down
+                break;
+            case 'ArrowUp':
+                paddle2.velocity.y = -speed
+                //go up
+                break;
+        }
+    })
+</script>
+
+</html>
